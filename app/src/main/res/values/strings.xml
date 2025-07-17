@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">YogaAdmin</string>
+    <string name="app_create_yoga">CreateYogaCourse</string>
+    <string name="btn_add">+</string>
+    <string name="btn_viewSchedule">🗓️</string>
+    <string-array name="day_of_week">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+    <string-array name="class_times">
+        <item>05:00 AM</item>
+        <item>07:00 AM</item>
+        <item>08:30 AM</item>
+        <item>10:00 AM</item>
+        <item>03:00 PM</item>
+        <item>05:30 PM</item>
+        <item>07:00 PM</item>
+    </string-array>
+    <string-array name="yoga_types">
+        <item>Hatha</item>
+        <item>Vinyasa</item>
+        <item>Yin</item>
+        <item>Ashtanga</item>
+        <item>Power</item>
+        <item>Restorative</item>
+    </string-array>
+    <string-array name="filter_options">
+        <item>By Name</item>
+        <item>By Date</item>
+        <item>By Day of Week</item>
+    </string-array>
+</resources>

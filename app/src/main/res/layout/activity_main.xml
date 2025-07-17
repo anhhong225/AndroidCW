@@ -30,16 +30,32 @@
         app:layout_constraintStart_toEndOf="@+id/btnAddCourse"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/btnUploadData"
+        style="@style/SquareBlackIconButton"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:drawableTop="@drawable/ic_upload"
+        android:gravity="center"
+        android:onClick="onUploadAllData"
+        android:padding="8dp"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="@+id/btnSearch"
+        app:layout_constraintStart_toStartOf="@+id/btnSearch"
+        app:layout_constraintTop_toBottomOf="@+id/lvCourse" />
+
     <ListView
         android:id="@+id/lvCourse"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="409dp"
+        android:layout_height="610dp"
         android:layout_marginStart="1dp"
         android:layout_marginEnd="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnSearch">
+        app:layout_constraintTop_toBottomOf="@+id/btnSearch"
+        app:layout_constraintVertical_bias="0.0">
 
     </ListView>
 
@@ -62,7 +78,6 @@
         android:drawableTop="@drawable/ic_search"
         android:onClick="onSearchClass"
         android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/lvCourse"
         app:layout_constraintStart_toEndOf="@+id/btnViewSchedule"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -36,7 +36,7 @@ public class CreateYogaCourse extends AppCompatActivity {
         edPrice = findViewById(R.id.edPrice);
         edmDes = findViewById(R.id.edmDes);
     }
-    public void onClickCreateYogaCourse(View v){
+    public void onClickCreateYogaCourse(View v) {
         String dayOfWeek = spDayOfWeek.getSelectedItem().toString();
         String time = spTime.getSelectedItem().toString();
         String type = spType.getSelectedItem().toString();
@@ -60,6 +60,7 @@ public class CreateYogaCourse extends AppCompatActivity {
             Toast.makeText(this, "Invalid capacity or price.", Toast.LENGTH_SHORT).show();
             return;
         }
+
         YogaCourse course = new YogaCourse();
         course.setDayofweek(dayOfWeek);
         course.setTime(time);
@@ -68,14 +69,21 @@ public class CreateYogaCourse extends AppCompatActivity {
         course.setDuration(duration);
         course.setPrice(price);
         course.setDescription(des);
-        // Insert to local database
-        MainActivity.helper.createNewYogaCourse(
-                course.getDayofweek(), course.getTime(), course.getCapacity(),
-                course.getDuration(), course.getPrice(), course.getType(), course.getDescription()
-        );
-        Toast.makeText(this, "A yoga class is just created", Toast.LENGTH_LONG).show();
+        course.setIsSynced(0);
+        course.setIsDeleted(0);
+
+        // Insert into local DB and retrieve generated ID
+        long id = MainActivity.helper.createNewYogaCourse(course);
+        course.setId((int) id);  // Save the generated ID for Firebase
+
+        // Upload to Firebase using the same ID
+        FirebaseHelper firebaseHelper = new FirebaseHelper(this);
+        firebaseHelper.createAYogaCourse(course);
+
+        Toast.makeText(this, "A yoga class is just created.", Toast.LENGTH_SHORT).show();
         finish();
     }
+
     public void onClickClear(View v){
         etCapacity.setText("");
         etDuration.setText("");

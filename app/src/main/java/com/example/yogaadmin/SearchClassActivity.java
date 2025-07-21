@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -51,6 +52,8 @@ public class SearchClassActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         etSearchTeacher = findViewById(R.id.etSearchTeacher);
         dpSearchDate = findViewById(R.id.dpSearchDate);
         spnDayOfWeek = findViewById(R.id.spSearchDay);
@@ -143,7 +146,8 @@ public class SearchClassActivity extends AppCompatActivity {
                     cursor.getInt(cursor.getColumnIndexOrThrow("_id")),
                     cursor.getString(cursor.getColumnIndexOrThrow("schedule_date")),
                     cursor.getString(cursor.getColumnIndexOrThrow("teacher")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("comment"))
+                    cursor.getString(cursor.getColumnIndexOrThrow("comment")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("yoga_course_id"))
             );
             schedules.add(s);
         }
@@ -170,6 +174,13 @@ public class SearchClassActivity extends AppCompatActivity {
         cal.set(year, month, day);
         return sdf.format(cal.getTime());
     }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
 
 class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapter.ItemViewHolder> {
@@ -178,6 +189,7 @@ class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapter.ItemV
 
     public interface OnItemClickListener {
         void onItemClick(int scheduleId, int yogaCourseId);
+//        Log.("");
     }
 
     public ScheduleListAdapter(List<Schedule> scheduleList, OnItemClickListener listener) {
@@ -211,12 +223,15 @@ class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapter.ItemV
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvDate, tvTeacher, tvComment;
+        private final Button btnEdit, btnDelete;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             tvDate = itemView.findViewById(R.id.tvScheduleDate);
             tvTeacher = itemView.findViewById(R.id.tvScheduleTeacher);
             tvComment = itemView.findViewById(R.id.tvScheduleComment);
+            btnEdit = itemView.findViewById(R.id.btnEditSchedule);
+            btnDelete = itemView.findViewById(R.id.btnDeleteSchedule);
         }
 
         public void bind(Schedule schedule, OnItemClickListener listener) {
@@ -224,6 +239,8 @@ class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapter.ItemV
             tvTeacher.setText("Teacher: " + schedule.getTeacher());
             tvComment.setText("Comment: " + schedule.getComment());
             itemView.setOnClickListener(v -> listener.onItemClick(schedule.getId(), schedule.getYogaCourseId()));
+            btnEdit.setVisibility(View.GONE);
+            btnDelete.setVisibility(View.GONE);
         }
     }
 }

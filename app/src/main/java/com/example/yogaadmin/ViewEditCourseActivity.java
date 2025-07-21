@@ -127,8 +127,26 @@ public class ViewEditCourseActivity extends AppCompatActivity {
 
             @Override
             public void onDeleteClicked(long scheduleId) {
-                MainActivity.helper.deleteScheduleById((int) scheduleId);
-                loadSchedules(); // Refresh
+                FirebaseHelper firebaseHelper = new FirebaseHelper(ViewEditCourseActivity.this);
+                DatabaseHelper dbHelper = MainActivity.helper;
+                Schedule schedule = dbHelper.getScheduleObjectById(scheduleId);
+                if (schedule != null) {
+                    String key = "schedule_" + schedule.getId();
+
+                    //Remove from Firebase immediately
+                    firebaseHelper.getScheduleRef().child(key).removeValue().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            // 3. If Firebase deletion successful → delete from local DB
+                            dbHelper.deleteScheduleById((int) scheduleId);
+                            Toast.makeText(ViewEditCourseActivity.this, "Deleted from Firebase and local DB.", Toast.LENGTH_SHORT).show();
+                            loadSchedules();
+                        } else {
+                            Toast.makeText(ViewEditCourseActivity.this, "Failed to delete from Firebase.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(ViewEditCourseActivity.this, "Schedule not found.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         RecyclerView rv = findViewById(R.id.rvSchedules);
@@ -139,9 +157,29 @@ public class ViewEditCourseActivity extends AppCompatActivity {
                 .setTitle("Delete Course")
                 .setMessage("Are you sure you want to delete this course and all its schedules?")
                 .setPositiveButton("Yes", (dialog, which) -> {
-                    MainActivity.helper.deleteYogaCourse(yogaCourseId);
-                    Toast.makeText(this, "Course deleted", Toast.LENGTH_SHORT).show();
-                    finish();
+                    // Delete YogaCourse from Firebase
+                    FirebaseHelper firebaseHelper = new FirebaseHelper(this);
+                    String courseKey = "course_" + yogaCourseId;
+                    firebaseHelper.getCourseRef().child(courseKey).removeValue().addOnCompleteListener(courseTask -> {
+                        if (courseTask.isSuccessful()) {
+                            // Delete all associated schedules from Firebase
+                            Cursor scheduleCursor = MainActivity.helper.getSchedulesByCourseId(yogaCourseId);
+                            while (scheduleCursor.moveToNext()) {
+                                int scheduleId = scheduleCursor.getInt(scheduleCursor.getColumnIndexOrThrow("_id"));
+                                String scheduleKey = "schedule_" + scheduleId;
+                                firebaseHelper.getScheduleRef().child(scheduleKey).removeValue();
+                            }
+                            scheduleCursor.close();
+                            //Mark as deleted locally
+                            MainActivity.helper.deleteScheduleByCourseId(yogaCourseId); // <- implement if needed
+                            MainActivity.helper.deleteYogaCourse(yogaCourseId);
+
+                            Toast.makeText(this, "Course and schedules deleted from Firebase and marked locally.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(this, "Failed to delete course from Firebase.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 })
                 .setNegativeButton("No", null)
                 .show();

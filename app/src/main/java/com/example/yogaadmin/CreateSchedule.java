@@ -80,30 +80,33 @@ public class CreateSchedule extends AppCompatActivity {
             Toast.makeText(this, "Selected date must be a " + expectedDayOfWeek, Toast.LENGTH_LONG).show();
             return;
         }
-        // Format full date for database
+
         String scheduleDate = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH).format(selectedDate.getTime());
         String teacher = ((EditText)findViewById(R.id.etTeacher)).getText().toString().trim();
         String comment = ((EditText)findViewById(R.id.etmComment)).getText().toString().trim();
+
         if (teacher.isEmpty()) {
             Toast.makeText(this, "Please enter a teacher name", Toast.LENGTH_SHORT).show();
             return;
         }
-        // Create Schedule object
+
         Schedule schedule = new Schedule();
         schedule.setDate(scheduleDate);
         schedule.setTeacher(teacher);
         schedule.setComment(comment);
         schedule.setYogaCourseId(yogaCourseId);
+        schedule.setIsSynced(0);
+        schedule.setIsDeleted(0);
 
-        long result = MainActivity.helper.createSchedule(
-                schedule.getYogaCourseId(),
-                schedule.getDate(),
-                schedule.getTeacher(),
-                schedule.getComment()
-        );
+        // Insert and get new local _id
+        long newId = MainActivity.helper.createSchedule(schedule);
+        if (newId != -1) {
+            schedule.setId((int) newId);
+            // Upload to Firebase
+            FirebaseHelper firebaseHelper = new FirebaseHelper(this);
+            firebaseHelper.createASchedule(schedule);
 
-        if (result != -1) {
-            Toast.makeText(this, "Schedule saved successfully!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Schedule saved and uploaded!", Toast.LENGTH_SHORT).show();
             finish();
         } else {
             Toast.makeText(this, "Error saving schedule.", Toast.LENGTH_SHORT).show();

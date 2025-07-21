@@ -9,6 +9,8 @@ public class YogaCourse {
     private float price;
     private String type;
     private String description;
+    private int isSynced;
+    private int isDeleted;
 
     public YogaCourse() {}  // Required for Firebase
 
@@ -48,4 +50,9 @@ public class YogaCourse {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public void setIsSynced(int isSynced) { this.isSynced = isSynced; }
+    public void setIsDeleted(int isDeleted) { this.isDeleted = isDeleted; }
+//    public int getIsSynced() { return isSynced; }
+//    public int getIsDeleted() { return isDeleted; }
 }

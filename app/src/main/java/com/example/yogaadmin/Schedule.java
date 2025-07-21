@@ -6,6 +6,8 @@ public class Schedule {
     private String teacher;
     private String comment;
     private int yogaCourseId; // Optional: if you want to relate to YogaCourse
+    private int isSynced;
+    private int isDeleted;
 
     public Schedule() {}  // Required for Firebase
 
@@ -40,4 +42,9 @@ public class Schedule {
 
     public int getYogaCourseId() { return yogaCourseId; }
     public void setYogaCourseId(int yogaCourseId) { this.yogaCourseId = yogaCourseId; }
+
+    public void setIsSynced(int isSynced) { this.isSynced = isSynced; }
+    public void setIsDeleted(int isDeleted) { this.isDeleted = isDeleted; }
+    public int getIsSynced() { return isSynced; }
+    public int getIsDeleted() { return isDeleted; }
 }

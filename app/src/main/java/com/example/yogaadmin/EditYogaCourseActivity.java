@@ -119,8 +119,15 @@ public class EditYogaCourseActivity extends AppCompatActivity {
             return;
         }
 
-        long result = MainActivity.helper.updateYogaCourse(yogaCourseId, dayOfWeek, time, capacity, duration, price, type, description);
+        long result = MainActivity.helper.updateYogaCourse(
+                yogaCourseId, dayOfWeek, time, capacity, duration, price, type, description
+        );
+
         if (result > 0) {
+            // Sync to Firebase
+            FirebaseHelper firebaseHelper = new FirebaseHelper(this);
+            firebaseHelper.uploadUpdatedYogaCourse(yogaCourseId);
+
             Toast.makeText(this, "Course updated successfully", Toast.LENGTH_SHORT).show();
             finish(); // Go back to previous screen
         } else {

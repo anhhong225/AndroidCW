@@ -65,47 +65,47 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
     public void onUploadAllData(View view) {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        new Thread(() -> {
+            if (!isNetworkAvailable() || !isInternetAccessible()) {
+                runOnUiThread(() -> Toast.makeText(this, "No internet access available.", Toast.LENGTH_SHORT).show());
+                return;
+            }
 
-        if (!isNetworkAvailable() || !isInternetAccessible()) {
-            Toast.makeText(this, "No internet access available.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        List<YogaCourse> unsyncedCourses = dbHelper.getUnsyncedYogaCourses();
-        List<Schedule> unsyncedSchedules = dbHelper.getUnsyncedSchedules();
-
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance("https://yogaadminfirebase-default-rtdb.asia-southeast1.firebasedatabase.app/");
-        DatabaseReference courseRef = firebaseDatabase.getReference("YogaCourse");
-        DatabaseReference scheduleRef = firebaseDatabase.getReference("Schedule");
-
-        for (YogaCourse course : unsyncedCourses) {
-            String key = courseRef.push().getKey();
-            if (key != null) {
+            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance("https://yogaadminfirebase-default-rtdb.asia-southeast1.firebasedatabase.app/");
+            DatabaseReference courseRef = firebaseDatabase.getReference("YogaCourse");
+            DatabaseReference scheduleRef = firebaseDatabase.getReference("Schedule");
+            // DELETE ALL IN FIREBASE
+            courseRef.removeValue();
+            scheduleRef.removeValue();
+            // RESET isSynced TO 0 LOCALLY
+            helper.resetAllSyncFlags();
+            // GET ALL LOCAL DATA (excluding isDeleted = 1)
+            List<YogaCourse> allCourses = helper.getAllYogaCourses();
+            List<Schedule> allSchedules = helper.getAllSchedules();
+            // UPLOAD TO FIREBASE USING LOCAL ID AS THE KEY
+            for (YogaCourse course : allCourses) {
+                String key = "course_" + course.getId(); // Use SQLite _id as Firebase key
                 courseRef.child(key).setValue(course).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        dbHelper.updateYogaCourseSyncStatus(course.getId(), true);
-                    } else {
-                        Log.e("FirebaseUpload", "Course upload failed: " + task.getException());
+                        helper.updateYogaCourseSyncStatus(course.getId(), true);
                     }
                 });
             }
-        }
 
-        for (Schedule schedule : unsyncedSchedules) {
-            String key = scheduleRef.push().getKey();
-            if (key != null) {
+            for (Schedule schedule : allSchedules) {
+                String key = "schedule_" + schedule.getId();
                 scheduleRef.child(key).setValue(schedule).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        dbHelper.updateYogaCourseSyncStatus(schedule.getId(), true);
-                    } else {
-                        Log.e("FirebaseUpload", "Schedule upload failed: " + task.getException());
+                        helper.updateScheduleSyncStatus(schedule.getId(), true);
                     }
                 });
             }
-        }
-        Toast.makeText(this, "No data to upload.", Toast.LENGTH_SHORT).show();
+
+            // FEEDBACK TO USER
+            runOnUiThread(() -> Toast.makeText(this, "Uploaded all local data to Firebase.", Toast.LENGTH_SHORT).show());
+        }).start();
     }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

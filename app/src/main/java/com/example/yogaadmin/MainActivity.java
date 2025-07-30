@@ -21,6 +21,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.yogaadmin.objects.Schedule;
+import com.example.yogaadmin.objects.YogaCourse;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(getApplicationContext(), SearchClassActivity.class);
         startActivity(i);
     }
+
     public void onUploadAllData(View view) {
         new Thread(() -> {
             if (!isNetworkAvailable() || !isInternetAccessible()) {
@@ -180,7 +184,7 @@ class YogaCourseCursorAdapter extends ResourceCursorAdapter{
         // Highlight selected row
         int position = cursor.getPosition();
         if (position == selectedPosition) {
-            view.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_light));
+            view.setBackgroundColor(context.getResources().getColor(R.color.light_grey));
         } else {
             view.setBackgroundColor(context.getResources().getColor(android.R.color.transparent));
         }

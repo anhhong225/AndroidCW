@@ -1,4 +1,4 @@
-package com.example.yogaadmin;
+package com.example.yogaadmin.objects;
 
 public class Schedule {
     private int id;

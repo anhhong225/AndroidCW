@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.yogaadmin.objects.Schedule;
+import com.example.yogaadmin.objects.YogaCourse;
+
 import java.util.ArrayList;
 import java.util.List;
 

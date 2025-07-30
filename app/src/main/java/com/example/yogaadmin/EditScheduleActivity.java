@@ -2,7 +2,6 @@ package com.example.yogaadmin;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
@@ -15,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.yogaadmin.objects.Schedule;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

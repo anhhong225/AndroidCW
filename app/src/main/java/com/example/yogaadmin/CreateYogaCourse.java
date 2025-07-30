@@ -13,6 +13,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.yogaadmin.objects.YogaCourse;
+
 public class CreateYogaCourse extends AppCompatActivity {
     private Spinner spDayOfWeek, spTime, spType;
     private EditText etCapacity, etDuration, edPrice, edmDes;

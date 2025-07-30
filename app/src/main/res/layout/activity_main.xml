@@ -10,9 +10,9 @@
     <Button
         android:id="@+id/btnAddCourse"
         style="@style/SquareBlackIconButton"
-        android:layout_width="60dp"
+        android:layout_width="50dp"
         android:layout_height="60dp"
-        android:layout_marginEnd="132dp"
+        android:layout_marginEnd="112dp"
         android:onClick="onCreateYogaCourse"
         android:text="@string/btn_add"
         app:layout_constraintBaseline_toBaselineOf="@+id/btnViewSchedule"
@@ -21,7 +21,7 @@
     <Button
         android:id="@+id/btnViewSchedule"
         style="@style/SquareBlackIconButton"
-        android:layout_width="60dp"
+        android:layout_width="50dp"
         android:layout_height="60dp"
         android:layout_marginStart="4dp"
         android:onClick="onViewCourseDetail"
@@ -33,29 +33,33 @@
     <Button
         android:id="@+id/btnUploadData"
         style="@style/SquareBlackIconButton"
-        android:layout_width="0dp"
+        android:layout_width="50dp"
         android:layout_height="60dp"
         android:drawableTop="@drawable/ic_upload"
         android:gravity="center"
         android:onClick="onUploadAllData"
         android:padding="8dp"
         android:text=""
-        app:layout_constraintEnd_toEndOf="@+id/btnSearch"
-        app:layout_constraintStart_toStartOf="@+id/btnSearch"
-        app:layout_constraintTop_toBottomOf="@+id/lvCourse" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.929"
+        app:layout_constraintStart_toEndOf="@+id/btnShowBooking"
+        app:layout_constraintTop_toTopOf="@+id/btnShowBooking"
+        app:layout_constraintVertical_bias="1.0" />
 
     <ListView
         android:id="@+id/lvCourse"
-        android:layout_width="409dp"
-        android:layout_height="610dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="398dp"
+        android:layout_height="598dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnUploadData"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnSearch"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.35000002">
 
     </ListView>
 
@@ -72,7 +76,7 @@
     <Button
         android:id="@+id/btnSearch"
         style="@style/SquareBlackIconButton"
-        android:layout_width="60dp"
+        android:layout_width="50dp"
         android:layout_height="60dp"
         android:layout_marginStart="4dp"
         android:drawableTop="@drawable/ic_search"
@@ -80,4 +84,16 @@
         android:text=""
         app:layout_constraintStart_toEndOf="@+id/btnViewSchedule"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnShowBooking"
+        style="@style/SquareBlackIconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:onClick="onShowBooking"
+        android:text="All Booking"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

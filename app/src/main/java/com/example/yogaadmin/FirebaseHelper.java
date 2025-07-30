@@ -4,15 +4,30 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.example.yogaadmin.objects.Schedule;
+import com.example.yogaadmin.objects.YogaCourse;
+import com.example.yogaadmin.objects.Booking;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 public class FirebaseHelper {
-    private DatabaseReference courseRef, scheduleRef;
+    private DatabaseReference courseRef, scheduleRef, bookingRef;
     private FirebaseDatabase firebaseDatabase;
     private Context context;
     private DatabaseHelper dbHelper;
@@ -22,6 +37,7 @@ public class FirebaseHelper {
         this.firebaseDatabase = FirebaseDatabase.getInstance("https://yogaadminfirebase-default-rtdb.asia-southeast1.firebasedatabase.app/");
         this.courseRef = firebaseDatabase.getReference("YogaCourse");
         this.scheduleRef = firebaseDatabase.getReference("Schedule");
+        this.bookingRef = firebaseDatabase.getReference("Bookings");
         this.dbHelper = new DatabaseHelper(context);
     }
 
@@ -31,6 +47,8 @@ public class FirebaseHelper {
     public DatabaseReference getCourseRef() {
         return courseRef;
     }
+    public DatabaseReference getBookingRef() {return bookingRef;}
+
     public void createAYogaCourse(YogaCourse course) {
         if (course == null || course.getId() == 0) return;
 
@@ -73,7 +91,7 @@ public class FirebaseHelper {
             course.setPrice(cursor.getFloat(cursor.getColumnIndexOrThrow("price")));
             course.setType(cursor.getString(cursor.getColumnIndexOrThrow("type")));
             course.setDescription(cursor.getString(cursor.getColumnIndexOrThrow("description")));
-            course.setIsSynced(0); // still mark unsynced
+            course.setIsSynced(0);
             course.setIsDeleted(0);
 
             cursor.close();
@@ -86,5 +104,53 @@ public class FirebaseHelper {
                 }
             });
         }
+    }
+    public void loadBooking(BookingLoadCallback callback) {
+        DatabaseReference bookingsRef = firebaseDatabase.getReference("Bookings");
+
+        bookingsRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                List<Booking> bookingList = new ArrayList<>();
+
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                    callback.onBookingLoaded(bookingList); // return empty list
+                } else {
+                    for (DataSnapshot data : task.getResult().getChildren()) {
+                        String key = data.getKey();
+                        HashMap r = (HashMap) data.getValue();
+
+                        Booking b = new Booking();
+                        b.setBookingId(key);
+                        b.setCustomerEmail(r.get("customerEmail").toString());
+                        b.setBookingDate(r.get("bookingDate").toString());
+
+                        // You can parse the schedule list manually too, if needed:
+//                        List<HashMap> scheduleMaps = (List<HashMap>) r.get("schedules");
+//                        if (scheduleMaps != null) {
+//                            List<Schedule> schedules = new ArrayList<>();
+//                            for (HashMap map : scheduleMaps) {
+//                                Schedule s = new Schedule();
+//                                s.setCourseName(map.get("courseName").toString());
+//                                s.setDayOfWeek(map.get("dayOfWeek").toString());
+//                                s.setTime(map.get("time").toString());
+//                                schedules.add(s);
+//                            }
+//                            b.setSchedules(schedules);
+//                        }
+
+                        bookingList.add(b);
+                    }
+
+                    // Sort if needed
+                    Collections.sort(bookingList, Comparator.comparing(Booking::getCustomerEmail));
+                    callback.onBookingLoaded(bookingList);
+                }
+            }
+        });
+    }
+    public interface BookingLoadCallback {
+        void onBookingLoaded(List<Booking> bookings);
     }
 }

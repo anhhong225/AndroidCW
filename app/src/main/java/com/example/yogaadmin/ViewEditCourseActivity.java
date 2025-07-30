@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +24,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.yogaadmin.objects.Schedule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +93,7 @@ public class ViewEditCourseActivity extends AppCompatActivity {
     private void loadCourseDetails() {
         Cursor c = MainActivity.helper.getYogaCourseById(yogaCourseId);
         if (c.moveToFirst()) {
-            tvType.setText("Type: " + c.getString(c.getColumnIndexOrThrow("type")));
+            tvType.setText(c.getString(c.getColumnIndexOrThrow("type")));
             tvDay.setText("Day: " + c.getString(c.getColumnIndexOrThrow("dayofweek")));
             tvTime.setText("Time: " + c.getString(c.getColumnIndexOrThrow("time")));
             tvCapacity.setText("Capacity: " + c.getInt(c.getColumnIndexOrThrow("capacity")));
@@ -221,7 +224,24 @@ class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewH
         holder.tvComment.setText("Comment: " + schedule.getComment());
 
         holder.btnEdit.setOnClickListener(v -> listener.onEditClicked(schedule.getId()));
-        holder.btnDelete.setOnClickListener(v -> listener.onDeleteClicked(schedule.getId()));
+        holder.btnDelete.setOnClickListener(v -> {
+            new AlertDialog.Builder(holder.itemView.getContext())
+                    .setTitle("Delete Schedule")
+                    .setMessage("Are you sure you want to delete this schedule?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        listener.onDeleteClicked(schedule.getId());
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), BookedCustomers.class);
+            intent.putExtra("scheduleId", schedule.getId());
+            intent.putExtra("scheduleDate", schedule.getDate());
+            holder.itemView.getContext().startActivity(intent);
+        });
+
     }
 
     @Override
@@ -231,7 +251,7 @@ class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewH
 
     public static class ScheduleViewHolder extends RecyclerView.ViewHolder {
         TextView tvDate, tvTeacher, tvComment;
-        Button btnEdit, btnDelete;
+        ImageButton btnEdit, btnDelete;
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);

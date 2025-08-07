@@ -7,8 +7,6 @@ public class Booking {
     private String bookingDate;
     private String customerEmail;
     private String customerName;
-    private String className;
-    private String yogaType;
 
     private Map<String, String> scheduleId;
 
@@ -53,7 +51,4 @@ public class Booking {
     public void setScheduleId(Map<String, String> scheduleId) {
         this.scheduleId = scheduleId;
     }
-
-    public String getClassName() { return className; }
-    public String getYogaType() { return yogaType; }
 }

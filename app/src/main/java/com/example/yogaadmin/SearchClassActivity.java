@@ -40,7 +40,6 @@ public class SearchClassActivity extends AppCompatActivity {
     private Button btnSearch, btnClear;
     private ScheduleListAdapter adapter;
     private RecyclerView rvResults;
-    private String selectedDayOfWeek = "";
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
     private int selectedFilterType = 0, yogaCourseId = -1;
     private long scheduleId = -1;
@@ -141,19 +140,22 @@ public class SearchClassActivity extends AppCompatActivity {
         }
 
         Cursor cursor = MainActivity.helper.searchClass(teacher, selectedDate, dayOfWeek);
-
         ArrayList<Schedule> schedules = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            Schedule s = new Schedule(
-                    cursor.getInt(cursor.getColumnIndexOrThrow("_id")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("schedule_date")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("teacher")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("comment")),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("yoga_course_id"))
-            );
-            schedules.add(s);
+
+        if (cursor != null) {
+            if(cursor.getCount() > 0){
+                while (cursor.moveToNext()) {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+                    String dateVal = cursor.getString(cursor.getColumnIndexOrThrow("schedule_date"));
+                    String teacherVal = cursor.getString(cursor.getColumnIndexOrThrow("teacher"));
+                    String commentVal = cursor.getString(cursor.getColumnIndexOrThrow("comment"));
+                    int courseId = cursor.getInt(cursor.getColumnIndexOrThrow("yoga_course_id"));
+
+                    schedules.add(new Schedule(id, dateVal, teacherVal, commentVal, courseId));
+                }
+            }
+            cursor.close();
         }
-        cursor.close();
 
         adapter.updateData(schedules);
         tvNoResults.setVisibility(schedules.isEmpty() ? View.VISIBLE : View.GONE);
@@ -174,7 +176,7 @@ public class SearchClassActivity extends AppCompatActivity {
         int year = dpSearchDate.getYear();
         Calendar cal = Calendar.getInstance();
         cal.set(year, month, day);
-        return sdf.format(cal.getTime());
+        return new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH).format(cal.getTime());
     }
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -225,15 +227,12 @@ class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapter.ItemV
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvDate, tvTeacher, tvComment;
-        private final Button btnEdit, btnDelete;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             tvDate = itemView.findViewById(R.id.tvScheduleDate);
             tvTeacher = itemView.findViewById(R.id.tvScheduleTeacher);
             tvComment = itemView.findViewById(R.id.tvScheduleComment);
-            btnEdit = itemView.findViewById(R.id.btnEditSchedule);
-            btnDelete = itemView.findViewById(R.id.btnDeleteSchedule);
         }
 
         public void bind(Schedule schedule, OnItemClickListener listener) {
@@ -241,8 +240,6 @@ class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapter.ItemV
             tvTeacher.setText("Teacher: " + schedule.getTeacher());
             tvComment.setText("Comment: " + schedule.getComment());
             itemView.setOnClickListener(v -> listener.onItemClick(schedule.getId(), schedule.getYogaCourseId()));
-            btnEdit.setVisibility(View.GONE);
-            btnDelete.setVisibility(View.GONE);
         }
     }
 }

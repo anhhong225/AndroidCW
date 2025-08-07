@@ -60,16 +60,23 @@ public class BookedCustomers extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 bookedUsers.clear();
                 for (DataSnapshot bookingSnap : snapshot.getChildren()) {
-                    String userEmail = bookingSnap.child("email").getValue(String.class);
-                    String userName = bookingSnap.child("name").getValue(String.class);
+                    DataSnapshot scheduleIdsSnap = bookingSnap.child("scheduleId");
+                    for (DataSnapshot schedSnap : scheduleIdsSnap.getChildren()) {
+                        String bookedScheduleId = String.valueOf(schedSnap.getValue());
 
-                    for (DataSnapshot schedSnap : bookingSnap.child("schedules").getChildren()) {
-                        String bookedScheduleId = schedSnap.child("id").getValue(String.class);
                         if (scheduleId.equals(bookedScheduleId)) {
-                            bookedUsers.add(new User(userName, userEmail));
-                            break;
+                            String userEmail = bookingSnap.child("customerEmail").getValue(String.class);
+                            String userName = bookingSnap.child("customerName").getValue(String.class);
+
+                            if (userEmail != null && userName != null) {
+                                bookedUsers.add(new User(userName, userEmail));
+                            }
+                            break; // no need to continue checking other scheduleIds
                         }
                     }
+                }
+                if (bookedUsers.isEmpty()) {
+                    Toast.makeText(BookedCustomers.this, "No customers found for this class.", Toast.LENGTH_SHORT).show();
                 }
                 adapter.notifyDataSetChanged();
             }

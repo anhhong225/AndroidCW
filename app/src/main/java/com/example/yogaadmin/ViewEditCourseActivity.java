@@ -26,6 +26,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yogaadmin.objects.Schedule;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -236,10 +240,29 @@ class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewH
         });
 
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(holder.itemView.getContext(), BookedCustomers.class);
-            intent.putExtra("scheduleId", schedule.getId());
-            intent.putExtra("scheduleDate", schedule.getDate());
-            holder.itemView.getContext().startActivity(intent);
+            FirebaseDatabase.getInstance().getReference("Bookings")
+                    .orderByChild("scheduleId")
+                    .equalTo("schedule_" + schedule.getId())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                // Bookings found → open BookedCustomers activity
+                                Intent intent = new Intent(holder.itemView.getContext(), BookedCustomers.class);
+                                intent.putExtra("scheduleId", "schedule_" + schedule.getId());
+                                intent.putExtra("scheduleDate", schedule.getDate());
+                                holder.itemView.getContext().startActivity(intent);
+                            } else {
+                                // No bookings → show message
+                                Toast.makeText(holder.itemView.getContext(), "No bookings for this schedule", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(holder.itemView.getContext(), "Error checking bookings", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
 
     }

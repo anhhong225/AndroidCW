@@ -152,18 +152,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor searchClass(String teacher, String date, String dayOfWeek) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        StringBuilder query = new StringBuilder("SELECT s.* FROM Schedule s JOIN YogaCourse y ON s.yoga_course_id = y._id WHERE 1=1");
+        StringBuilder query = new StringBuilder(
+                "SELECT s._id, s.yoga_course_id, s.schedule_date, s.teacher, s.comment " +
+                        "FROM Schedule s " +
+                        "JOIN YogaCourse y ON s.yoga_course_id = y._id " +
+                        "WHERE s.isDeleted = 0"
+        );
         ArrayList<String> args = new ArrayList<>();
 
-        if (!teacher.isEmpty()) {
+        if (teacher != null && !teacher.isEmpty()) {
             query.append(" AND s.teacher LIKE ?");
             args.add("%" + teacher + "%");
         }
-        if (!date.isEmpty()) {
+        if (date != null && !date.isEmpty()) {
             query.append(" AND s.schedule_date = ?");
             args.add(date);
         }
-        if (!dayOfWeek.isEmpty()) {
+        if (dayOfWeek != null && !dayOfWeek.isEmpty()) {
             query.append(" AND y.dayofweek = ?");
             args.add(dayOfWeek);
         }
